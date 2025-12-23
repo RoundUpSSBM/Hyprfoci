@@ -166,7 +166,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
 
   const std::string HASH = __hyprland_api_get_hash();
 
-  if (HASH != GIT_COMMIT_HASH) {
+  if (HASH.find(GIT_COMMIT_HASH) != 0) {
     HyprlandAPI::addNotification(
         PHANDLE,
         "[Hyprfoci] Failure in initialization: Version mismatch (headers ver "
