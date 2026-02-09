@@ -99,10 +99,11 @@ plugin {
 
 		# Absolute path is needed (~ for home directory is fine)
 		img = /path/to/your/image.png
+        
+        # can also exclude specific windows!
+        exclude = kitty, firefox        
 	}
 }
-# can also disable/enable with windowrule!
-windowrule = plugin:hyprfoci:enabled 0, class:kitty
 ```
 
 

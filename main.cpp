@@ -7,6 +7,8 @@
 #include <hyprland/src/Compositor.hpp>
 #include <hyprland/src/helpers/MiscFunctions.hpp>
 #include <hyprland/src/plugins/PluginAPI.hpp>
+#include <hyprland/src/desktop/state/FocusState.hpp>
+#include <hyprland/src/desktop/view/Window.hpp>
 #include <hyprlang.hpp>
 #include <hyprutils/math/Vector2D.hpp>
 #include <hyprutils/memory/SharedPtr.hpp>
@@ -137,15 +139,32 @@ void onActiveWindow(void *self, std::any data) {
   }
 
   if (PWINDOW) {
+    static const auto excluded =
+        (const Hyprlang::STRING *)HyprlandAPI::getConfigValue(
+           PHANDLE, "plugin:hyprfoci:exclude")
+           ->getDataStaticPtr();
+
+    std::string WindowTitle = PWINDOW->m_class;
+    std::string className;
+    for(char c : std::string{*excluded} + ',') {
+      if (c == ' ' || c == ',') {
+        if(!className.empty() && WindowTitle == className) {
+          current = nullptr;
+          return;
+        }
+        className = "";
+      }
+      else className += c;
+    }
+
     auto square = makeUnique<CDotDecoration>(PWINDOW);
     current = square.get();
-
     HyprlandAPI::addWindowDecoration(PHANDLE, PWINDOW, std::move(square));
   }
 }
 
 void onConfigReload(void *self, std::any data) {
-  const auto PWINDOW = g_pCompositor->m_lastWindow.lock();
+  const auto PWINDOW = Desktop::focusState()->window();
 
   if (current) {
     HyprlandAPI::removeWindowDecoration(PHANDLE, current);
@@ -187,6 +206,8 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
       Hyprlang::INT{*configStringToInt("rgba(11ff3388)")});
   HyprlandAPI::addConfigValue(PHANDLE, "plugin:hyprfoci:rounding",
                               Hyprlang::FLOAT{4.0});
+  HyprlandAPI::addConfigValue(PHANDLE, "plugin:hyprfoci:exclude",
+                              Hyprlang::STRING{""});
 
   HyprlandAPI::addConfigValue(PHANDLE, "plugin:hyprfoci:img",
                               Hyprlang::STRING{"none"});
