@@ -1,3 +1,6 @@
+# Archived repository
+moved to [hypr-bongocat](https://github.com/RoundUpSSBM/hypr-bongocat)
+
 # Hyprfoci (Hyprland Focus Indicator)
 
 A tiny Hyprland plugin that draws a single, always-visible dot in the corner of the screen whenever any window has input focus.
